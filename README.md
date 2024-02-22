@@ -1,3 +1,5 @@
+# 📖 Python Bindings for [`gemma.cpp`](https://github.com/google/gemma.cpp)
+
 ## Installation
 
 Create conda environment
@@ -8,7 +10,7 @@ pip install -r requirements.txt
 
 Build the gemma package from source
 ```
-pip install -e .
+pip install .
 ```
 Or install it
 ```
