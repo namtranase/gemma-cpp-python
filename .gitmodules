@@ -1,0 +1,3 @@
+[submodule "vendor/gemma.cpp"]
+	path = vendor/gemma.cpp
+	url = https://github.com/google/gemma.cpp
