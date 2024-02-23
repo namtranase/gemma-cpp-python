@@ -22,15 +22,13 @@ add_subdirectory(vendor/pybind11)
 #add_subdirectory(vendor/gemma.cpp)
 
 # Create the Python module
-pybind11_add_module(gemma_cpp src/pygemma.cpp)
+pybind11_add_module(pygemma src/gemma_binding.cpp)
 
-target_link_libraries(gemma_cpp PRIVATE libgemma hwy hwy_contrib sentencepiece)
+target_link_libraries(pygemma PRIVATE libgemma hwy hwy_contrib sentencepiece)
 
 # Link against libgemma.a and any other necessary libraries
 # After linking, try to include the directories. Adjust this if necessary.
 FetchContent_GetProperties(gemma)
 FetchContent_GetProperties(sentencepiece)
-target_include_directories(gemma_cpp PRIVATE ${gemma_SOURCE_DIR})
-target_include_directories(gemma_cpp PRIVATE ${sentencepiece_SOURCE_DIR})
-
-
+target_include_directories(pygemma PRIVATE ${gemma_SOURCE_DIR})
+target_include_directories(pygemma PRIVATE ${sentencepiece_SOURCE_DIR})

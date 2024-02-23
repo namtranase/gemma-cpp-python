@@ -1,41 +1,76 @@
-from setuptools import setup, Extension, find_packages
+import os
+import subprocess
+import sys
+from setuptools import setup, find_packages, Extension
 from setuptools.command.build_ext import build_ext
-import pybind11
 
 
-class CustomBuildExt(build_ext):
-    def build_extensions(self):
-        # Customize the build process here if needed
-        build_ext.build_extensions(self)
+class CMakeExtension(Extension):
+    def __init__(self, name, sourcedir=""):
+        Extension.__init__(self, name, sources=[])
+        self.sourcedir = os.path.abspath(sourcedir)
 
-# Include the pybind11 include directory
-pybind11_include_dir = pybind11.get_include()
 
-ext_modules = [
-    Extension(
-        'gemma_cpp_extension',  # Name of the module to import in Python
-        ['src/binding.cc', 'vendor/gemma.cpp/gemma.cc', 'vendor/gemma.cpp/run.cc'],  # Source files
-        include_dirs=[pybind11_include_dir, './src/include', './vendor/gemma.cpp/compression', './vendor/gemma.cpp/util'],  # Include directories
-        language='c++',
-        extra_compile_args=['-std=c++11'],  # Replace with your required C++ version
-    ),
-]
+class CMakeBuild(build_ext):
+    def run(self):
+        try:
+            out = subprocess.check_output(["cmake", "--version"])
+        except OSError:
+            raise RuntimeError(
+                "CMake must be installed to build the following extensions: "
+                + ", ".join(e.name for e in self.extensions)
+            )
+
+        for ext in self.extensions:
+            self.build_extension(ext)
+
+    def build_extension(self, ext):
+        extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
+        cmake_args = [
+            "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=" + extdir,
+            "-DPYTHON_EXECUTABLE=" + sys.executable,
+        ]
+
+        cfg = "Debug" if self.debug else "Release"
+        build_args = ["--config", cfg]
+
+        # Add a parallel build option
+        build_args += [
+            "--",
+            "-j",
+            "12",
+        ]  # Specifies the number of jobs to run simultaneously
+
+        if not os.path.exists(self.build_temp):
+            os.makedirs(self.build_temp)
+
+        subprocess.check_call(
+            ["cmake", ext.sourcedir] + cmake_args, cwd=self.build_temp
+        )
+        subprocess.check_call(
+            ["cmake", "--build", ".", "--target", ext.name] + build_args,
+            cwd=self.build_temp,
+        )
+
 
 setup(
-    name='gemma-cpp-python',
-    version='0.1.0',
-    author='Nam Tran',
-    author_email='trannam.ase@gmail.com',
-    description='A Python wrapper for the GEMMA C++ library',
-    long_description=open('README.md').read(),
-    long_description_content_type='text/markdown',
+    name="pygemma",
+    version="0.1.0",
+    author="Nam Tran",
+    author_email="namtran.ase@gmail.com",
+    description="A Python package with a C++ backend using gemma.",
+    long_description="""
+    This package provides Python bindings to a C++ library using pybind11.
+    """,
+    long_description_content_type="text/markdown",
+    ext_modules=[CMakeExtension("pygemma")],
+    cmdclass=dict(build_ext=CMakeBuild),
+    zip_safe=False,
     packages=find_packages(),
-    ext_modules=ext_modules,
-    cmdclass={
-        'build_ext': CustomBuildExt,
-    },
-    # Add all other necessary package metadata
-    install_requires=[
-        'pybind11>=2.6',
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
     ],
+    python_requires=">=3.8",
 )
