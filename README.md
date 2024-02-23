@@ -11,12 +11,26 @@ Special thanks to the creators and contributors of [gemma.cpp](https://github.co
 
 
 ## 🛠 Installation
+`Prerequisites`: Ensure Python 3.8+ and pip are installed.
 
+### Install from PyPI
+For a quick setup, install directly from PyPI:
+```bash
+pip install pygemma==0.1.0
+```
+
+### For Developers: Install from Source
+To install the latest version or for development purposes:
+
+1. Clone the repo and enter the directory:
 ```bash
 git clone https://github.com/namtranase/gemma-cpp-python.git
-git submodule update --init --recursive
-pip install -r requirements.txt
-pip install .
+cd gemma-cpp-python
+```
+
+2. Install Python dependencies and pygemma:
+```bash
+pip install -r requirements.txt && pip install .
 ```
 
 ## 🖥 Usage
@@ -28,8 +42,6 @@ For usage examples, refer to tests/test_chat.py. Here's a quick start:
 import pygemma
 pygemma.show_help()
 ```
-
-
 
 ## 🤝 Contributing
 Contributions are welcome. Please clone the repository, push your changes to a new branch, and submit a pull request.
