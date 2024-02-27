@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.11)  # or whatever minimum version you require
+cmake_minimum_required(VERSION 3.11) # or whatever minimum version you require
 
 include(FetchContent)
 
@@ -14,12 +14,11 @@ FetchContent_MakeAvailable(sentencepiece)
 FetchContent_Declare(gemma GIT_REPOSITORY https://github.com/google/gemma.cpp GIT_TAG origin/main)
 FetchContent_MakeAvailable(gemma)
 
-
 FetchContent_Declare(highway GIT_REPOSITORY https://github.com/google/highway.git GIT_TAG da250571a45826b21eebbddc1e50d0c1137dee5f)
 FetchContent_MakeAvailable(highway)
 
-add_subdirectory(vendor/pybind11)
-#add_subdirectory(vendor/gemma.cpp)
+FetchContent_Declare(pybind11 GIT_REPOSITORY https://github.com/pybind/pybind11.git GIT_TAG v2.10.4)
+FetchContent_MakeAvailable(pybind11)
 
 # Create the Python module
 pybind11_add_module(pygemma src/gemma_binding.cpp)
@@ -27,7 +26,6 @@ pybind11_add_module(pygemma src/gemma_binding.cpp)
 target_link_libraries(pygemma PRIVATE libgemma hwy hwy_contrib sentencepiece)
 
 # Link against libgemma.a and any other necessary libraries
-# After linking, try to include the directories. Adjust this if necessary.
 FetchContent_GetProperties(gemma)
 FetchContent_GetProperties(sentencepiece)
 target_include_directories(pygemma PRIVATE ${gemma_SOURCE_DIR})
