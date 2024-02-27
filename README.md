@@ -1,6 +1,8 @@
 # gemma-cpp-python: Python Bindings for [gemma.cpp](https://github.com/google/gemma.cpp)
 
-**Latest Version: v0.1.0**
+**Latest Version: v0.1.1**
+- Work for both Linux an MacOS machine
+- Remove the pybind11 from vendors
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
