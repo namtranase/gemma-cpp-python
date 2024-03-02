@@ -261,7 +261,6 @@ namespace gcpp
     {
         std::string generated_text;
         // Seed the random number generator
-        int current_pos = 0;
         std::random_device rd;
         std::mt19937 gen(rd());
         int prompt_size{};
@@ -277,27 +276,14 @@ namespace gcpp
         // Placeholder for generated token IDs
         std::vector<int> generated_tokens;
         // Define lambda for token decoding
-        StreamFunc stream_token = [&generated_tokens,&current_pos](int token, float /* probability */) -> bool {
-            ++current_pos;
+        StreamFunc stream_token = [&generated_tokens](int token, float /* probability */) -> bool {
             generated_tokens.push_back(token);
             return true; // Continue generating
         };
-        // Decode each token and concatenate
+        // Decode tokens
         prompt_size = prompt.size();    
         GenerateGemma(model, args, prompt, /*start_pos=*/0, pool, inner_pool, stream_token, accept_token, gen, verbosity);
-        // for (int token : generated_tokens) {
-        //     std::string token_text;
-        //     if (model.Tokenizer().Decode(std::vector<int>{token}, &token_text).ok()) {
-        //         generated_text += token_text; // Appending a space for readability
-        //     }
         HWY_ASSERT(model.Tokenizer().Decode(generated_tokens, &generated_text).ok());
-        // for (int i = prompt_size; i < generated_tokens.size(); ++i) {
-        //     std::string token_text;
-        //     if (model.Tokenizer().Decode(std::vector<int>{generated_tokens[i]}, &token_text).ok()) {
-        //         generated_text += token_text; // Appending a space for readability
-        //     }
-        // }
-        // remove promp from generated text
         generated_text = generated_text.substr(prompt_string.size());
 
     return generated_text;
@@ -355,8 +341,7 @@ std::string completion_base(int argc, char **argv)
     gcpp::InferenceArgs inference(argc, argv);
     gcpp::AppArgs app(argc, argv);
     std::string prompt_string = argv[argc-1];
-    std::string output_text = gcpp::completion(loader, inference, app, prompt_string);
-    return output_text;
+    return gcpp::completion(loader, inference, app, prompt_string);
 }
 std::string completion_base_wrapper(const std::vector<std::string> &args,std::string &prompt_string)
 {
@@ -372,8 +357,7 @@ std::string completion_base_wrapper(const std::vector<std::string> &args,std::st
     }
     argv_vec.push_back(const_cast<char *>(prompt_string.c_str()));
     char **argv = argv_vec.data();
-    std::string output = completion_base(argc, argv);
-    return output;
+    return completion_base(argc, argv);
 }
 void show_help_wrapper()
 {
