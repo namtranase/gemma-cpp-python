@@ -135,7 +135,7 @@ namespace gcpp
 
         while (abs_pos < args.max_tokens)
         {
-            std::string prompt_string;
+            std::string prompt_string;  
             std::vector<int> prompt;
             current_pos = 0;
             {
@@ -255,6 +255,72 @@ namespace gcpp
                   { return true; });
     }
 
+    std::string decode(gcpp::Gemma &model, hwy::ThreadPool &pool,
+                   hwy::ThreadPool &inner_pool, const InferenceArgs &args,
+                   int verbosity, const gcpp::AcceptFunc &accept_token, std::string &prompt_string) 
+    {
+        std::string generated_text;
+        // Seed the random number generator
+        int current_pos = 0;
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        int prompt_size{};
+        if (model.model_training == ModelTraining::GEMMA_IT)
+            {
+                // For instruction-tuned models: add control tokens.
+                prompt_string = "<start_of_turn>user\n" + prompt_string +
+                                "<end_of_turn>\n<start_of_turn>model\n";
+            }
+        // Encode the prompt string into tokens
+        std::vector<int> prompt;
+        HWY_ASSERT(model.Tokenizer().Encode(prompt_string, &prompt).ok());
+        // Placeholder for generated token IDs
+        std::vector<int> generated_tokens;
+        // Define lambda for token decoding
+        StreamFunc stream_token = [&generated_tokens,&current_pos](int token, float /* probability */) -> bool {
+            ++current_pos;
+            generated_tokens.push_back(token);
+            return true; // Continue generating
+        };
+        // Decode each token and concatenate
+        prompt_size = prompt.size();    
+        GenerateGemma(model, args, prompt, /*start_pos=*/0, pool, inner_pool, stream_token, accept_token, gen, verbosity);
+        // for (int token : generated_tokens) {
+        //     std::string token_text;
+        //     if (model.Tokenizer().Decode(std::vector<int>{token}, &token_text).ok()) {
+        //         generated_text += token_text; // Appending a space for readability
+        //     }
+        HWY_ASSERT(model.Tokenizer().Decode(generated_tokens, &generated_text).ok());
+        // for (int i = prompt_size; i < generated_tokens.size(); ++i) {
+        //     std::string token_text;
+        //     if (model.Tokenizer().Decode(std::vector<int>{generated_tokens[i]}, &token_text).ok()) {
+        //         generated_text += token_text; // Appending a space for readability
+        //     }
+        // }
+        // remove promp from generated text
+        generated_text = generated_text.substr(prompt_string.size());
+
+    return generated_text;
+    }
+
+    std::string completion(LoaderArgs &loader, InferenceArgs &inference, AppArgs &app, std::string &prompt_string)
+    {
+        hwy::ThreadPool inner_pool(0);
+        hwy::ThreadPool pool(app.num_threads);
+        if (app.num_threads > 10)
+        {
+            PinThreadToCore(app.num_threads - 1); // Main thread
+
+            pool.Run(0, pool.NumThreads(),
+                     [](uint64_t /*task*/, size_t thread)
+                     { PinThreadToCore(thread); });
+        }
+        gcpp::Gemma model(loader, pool);
+        return decode(model, pool, inner_pool, inference, app.verbosity, /*accept_token=*/[](int)
+                  { return true; }, prompt_string);
+
+    }
+
 } // namespace gcpp
 
 void chat_base(int argc, char **argv)
@@ -283,7 +349,32 @@ void chat_base(int argc, char **argv)
     PROFILER_PRINT_RESULTS(); // Must call outside the zone above.
     // return 1;
 }
+std::string completion_base(int argc, char **argv)
+{   
+    gcpp::LoaderArgs loader(argc, argv);
+    gcpp::InferenceArgs inference(argc, argv);
+    gcpp::AppArgs app(argc, argv);
+    std::string prompt_string = argv[argc-1];
+    std::string output_text = gcpp::completion(loader, inference, app, prompt_string);
+    return output_text;
+}
+std::string completion_base_wrapper(const std::vector<std::string> &args,std::string &prompt_string)
+{
+    int argc = args.size() + 2; // +1 for the program name
+    std::vector<char *> argv_vec;
+    argv_vec.reserve(argc);
 
+    argv_vec.push_back(const_cast<char *>("pygemma"));
+
+    for (const auto &arg : args)
+    {
+        argv_vec.push_back(const_cast<char *>(arg.c_str()));
+    }
+    argv_vec.push_back(const_cast<char *>(prompt_string.c_str()));
+    char **argv = argv_vec.data();
+    std::string output = completion_base(argc, argv);
+    return output;
+}
 void show_help_wrapper()
 {
     // Assuming ShowHelp does not critically depend on argv content
@@ -294,12 +385,11 @@ void show_help_wrapper()
     ShowHelp(loader, inference, app);
 }
 
-void chat_base_wrapper(const std::vector<std::string> &args)
+std::string chat_base_wrapper(const std::vector<std::string> &args)
 {
     int argc = args.size() + 1; // +1 for the program name
     std::vector<char *> argv_vec;
     argv_vec.reserve(argc);
-
     argv_vec.push_back(const_cast<char *>("pygemma"));
 
     for (const auto &arg : args)
@@ -308,12 +398,15 @@ void chat_base_wrapper(const std::vector<std::string> &args)
     }
 
     char **argv = argv_vec.data();
+
     chat_base(argc, argv);
 }
+
 
 PYBIND11_MODULE(pygemma, m)
 {
     m.doc() = "Pybind11 integration for chat_base function";
     m.def("chat_base", &chat_base_wrapper, "A wrapper for the chat_base function accepting Python list of strings as arguments");
     m.def("show_help", &show_help_wrapper, "A wrapper for show_help function");
+    m.def("completion", &completion_base_wrapper, "A wrapper for inference function");
 }
