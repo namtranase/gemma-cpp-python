@@ -1,8 +1,8 @@
 # gemma-cpp-python: Python Bindings for [gemma.cpp](https://github.com/google/gemma.cpp)
 
-**Latest Version: v0.1.1**
-- Work for both Linux an MacOS machine
-- Remove the pybind11 from vendors
+**Latest Version: v0.1.2**
+- Support Completion function
+- Fix the MacOS pip install
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
@@ -18,7 +18,7 @@ Special thanks to the creators and contributors of [gemma.cpp](https://github.co
 ### Install from PyPI
 For a quick setup, install directly from PyPI:
 ```bash
-pip install pygemma==0.1.0
+pip install pygemma==0.1.2
 ```
 
 ### For Developers: Install from Source
