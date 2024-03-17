@@ -1,5 +1,5 @@
 import argparse
-import pygemma
+from pygemma import Gemma
 
 
 def main():
@@ -19,36 +19,19 @@ def main():
         "--model", type=str, required=True, help="Model type identifier."
     )
     parser.add_argument(
-        "--input", type=str, required=False, help="Input text to chat with the model. If None, Switch to Chat mode.",
-        default="Hello."
+        "--input",
+        type=str,
+        required=False,
+        help="Input text to chat with the model. If None, Switch to Chat mode.",
+        default="Hello.",
     )
     # Now using the parsed arguments
     args = parser.parse_args()
-    if args.input is not None:
-        string = pygemma.completion(
-            [
-                "--tokenizer",
-                args.tokenizer,
-                "--compressed_weights",
-                args.compressed_weights,
-                "--model",
-                args.model,
-            ], args.input
-        )
-        print(string)
-    else:
-        return pygemma.chat_base(
-            [
-                "--tokenizer",
-                args.tokenizer,
-                "--compressed_weights",
-                args.compressed_weights,
-                "--model",
-                args.model,
-            ]
-        )
-    # Optionally, show help if needed
-    # pygemma.show_help()
+
+    gemma = Gemma()
+    gemma.show_config()
+    gemma.show_help()
+    gemma.load_model(args.tokenizer, args.compressed_weights, args.model)
 
 
 if __name__ == "__main__":

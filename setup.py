@@ -3,6 +3,7 @@ import subprocess
 import sys
 from setuptools import setup, find_packages, Extension
 from setuptools.command.build_ext import build_ext
+import platform
 
 
 class CMakeExtension(Extension):
@@ -39,7 +40,7 @@ class CMakeBuild(build_ext):
             "--",
             "-j",
             "12",
-        ]  # Specifies the number of jobs to run simultaneously
+        ]
 
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
@@ -58,7 +59,7 @@ setup(
     version="0.1.2",
     author="Nam Tran",
     author_email="namtran.ase@gmail.com",
-    description="A Python package with a C++ backend using gemma.",
+    description="A Python package with a C++ backend using gemma.cpp",
     long_description="""
     This package provides Python bindings to a C++ library using pybind11.
     """,
