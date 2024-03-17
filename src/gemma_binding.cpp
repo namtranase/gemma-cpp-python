@@ -1,5 +1,3 @@
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
 // #include "gemma.h" // Adjust include path as necessary
 #include <ctime>
 #include <iostream>
@@ -19,7 +17,6 @@
 #include "hwy/profiler.h"
 #include "hwy/timer.h"
 
-namespace py = pybind11;
 
 namespace gcpp
 {
@@ -387,10 +384,8 @@ std::string chat_base_wrapper(const std::vector<std::string> &args)
 }
 
 
-PYBIND11_MODULE(pygemma, m)
+int main(int argc, char **argv)
 {
-    m.doc() = "Pybind11 integration for chat_base function";
-    m.def("chat_base", &chat_base_wrapper, "A wrapper for the chat_base function accepting Python list of strings as arguments");
-    m.def("show_help", &show_help_wrapper, "A wrapper for show_help function");
-    m.def("completion", &completion_base_wrapper, "A wrapper for inference function");
+    chat_base(argc, argv);
+    return 0;
 }

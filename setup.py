@@ -38,7 +38,7 @@ class CMakeBuild(build_ext):
         build_args += [
             "--",
             "-j",
-            "12",
+            "6",
         ]  # Specifies the number of jobs to run simultaneously
 
         if not os.path.exists(self.build_temp):

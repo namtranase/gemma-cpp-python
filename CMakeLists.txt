@@ -21,8 +21,7 @@ FetchContent_Declare(pybind11 GIT_REPOSITORY https://github.com/pybind/pybind11.
 FetchContent_MakeAvailable(pybind11)
 
 # Create the Python module
-pybind11_add_module(pygemma src/gemma_binding.cpp)
-
+add_library(pygemma SHARED src/gemma_binding.cpp)
 target_link_libraries(pygemma PRIVATE libgemma hwy hwy_contrib sentencepiece)
 
 # Link against libgemma.a and any other necessary libraries
