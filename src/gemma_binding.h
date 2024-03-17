@@ -35,7 +35,7 @@ class GemmaWrapper {
       void loadModel(const std::vector<std::string> &args); // Consider exception safety
       void showConfig();
       void showHelp();
-      std::string completionPrompt();
+      int completionPrompt(std::string& prompt);
 
     private:
         gcpp::LoaderArgs m_loader = gcpp::LoaderArgs(0, nullptr);

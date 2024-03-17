@@ -32,6 +32,8 @@ def main():
     gemma.show_config()
     gemma.show_help()
     gemma.load_model(args.tokenizer, args.compressed_weights, args.model)
+    gemma.completion("Write a poem")
+    gemma.completion("What is the best war in history")
 
 
 if __name__ == "__main__":
