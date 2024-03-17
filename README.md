@@ -14,6 +14,7 @@ Special thanks to the creators and contributors of [gemma.cpp](https://github.co
 
 ## 🛠 Installation
 `Prerequisites`: Ensure Python 3.8+ and pip are installed.
+
 `System requirements`: For now, I only tested it on the Unix-like Platforms and the MacOS
 
 ### Install from PyPI
