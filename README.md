@@ -15,7 +15,9 @@ Special thanks to the creators and contributors of [gemma.cpp](https://github.co
 ## 🛠 Installation
 `Prerequisites`: Ensure Python 3.8+ and pip are installed.
 
-`System requirements`: For now, I only tested it on the Unix-like Platforms and the MacOS
+`System requirements`: For now, I only tested it on the Unix-like Platforms and the MacOS. Please visit the [gemma.cpp installation](https://github.com/google/gemma.cpp?tab=readme-ov-file#system-requirements) for more details.
+
+`Models`: pygemma supported 2b-it-sfp model for now, to install model, [please visit here](https://github.com/google/gemma.cpp?tab=readme-ov-file#step-1-obtain-model-weights-and-tokenizer-from-kaggle-or-hugging-face-hub)
 
 ### Install from PyPI
 For a quick setup, install directly from PyPI:
