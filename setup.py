@@ -56,7 +56,7 @@ class CMakeBuild(build_ext):
 
 setup(
     name="pygemma",
-    version="0.1.3",
+    version="0.1.3.post3",
     author="Nam Tran",
     author_email="namtran.ase@gmail.com",
     description="A Python package with a C++ backend using gemma.cpp",

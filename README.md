@@ -1,6 +1,7 @@
 # gemma-cpp-python: Python Bindings for [gemma.cpp](https://github.com/google/gemma.cpp)
 
-**Latest Version: v0.1.3**
+**Latest Version: v0.1.3.post3**
+- Fixed absolute path for libsentencepiece.0.0.0.dylib
 - Interface changes due to updates in gemma.cpp.
 - Enhanced user experience for ease of use 🙏. Give it a try!
 
