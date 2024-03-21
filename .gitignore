@@ -162,8 +162,8 @@ cython_debug/
 # Vscode
 .vscode/
 
-# Precommit
+# Project
 .pre-commit-config.yaml
-
-# Models
 models/
+fixed_wheels
+playground

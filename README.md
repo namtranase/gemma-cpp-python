@@ -12,6 +12,10 @@
 ## 🙏 Acknowledgments
 Special thanks to the creators and contributors of [gemma.cpp](https://github.com/google/gemma.cpp) for their foundational work.
 
+## 💬 Demo Chat
+Check out the new chat demo included in the examples directory! This interactive interface showcases how you can engage in real-time conversations with the Gemma model.
+
+![Gemma Cpp Python Chat Demo](asset/demo_chat.png)
 
 ## 🛠 Installation
 `Prerequisites`: Ensure Python 3.8+ and pip are installed.
@@ -52,6 +56,13 @@ gemma.show_help()
 gemma.show_config()
 gemma.load_model("/path/to/tokenizer", "/path/to/compressed_weight/", "model_type")
 gemma.completion("Write a poem")
+```
+
+To run the demo on your local machine:
+```bash
+cd gemma-cpp-python/examples
+pip install -r requirements.txt
+streamlit run streamlit_demo.py
 ```
 
 ## 🤝 Contributing

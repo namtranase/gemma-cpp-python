@@ -7,6 +7,7 @@
 #include <string>
 #include <thread>  // NOLINT
 #include <vector>
+#include <sstream>
 
 // copybara:import_next_line:gemma_cpp
 #include "compression/compress.h"
@@ -35,7 +36,7 @@ class GemmaWrapper {
       void loadModel(const std::vector<std::string> &args); // Consider exception safety
       void showConfig();
       void showHelp();
-      int completionPrompt(std::string& prompt);
+      std::string completionPrompt(std::string& prompt);
 
     private:
         gcpp::LoaderArgs m_loader = gcpp::LoaderArgs(0, nullptr);

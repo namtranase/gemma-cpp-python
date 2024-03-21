@@ -194,7 +194,7 @@ std::vector<int> tokenize(
   return tokens;
 }
 
-int GemmaWrapper::completionPrompt(std::string& prompt) {
+std::string GemmaWrapper::completionPrompt(std::string& prompt) {
   size_t pos = 0;  // KV Cache position
   size_t num_threads = static_cast<size_t>(std::clamp(
       static_cast<int>(std::thread::hardware_concurrency()) - 2, 1, 18));
@@ -208,9 +208,10 @@ int GemmaWrapper::completionPrompt(std::string& prompt) {
   std::vector<int> tokens =
       tokenize(prompt, this->m_model->Tokenizer());
   size_t ntokens = tokens.size();
+  std::stringstream generated_text;
 
   // This callback function gets invoked everytime a token is generated
-  auto stream_token = [&pos, &gen, &ntokens, tokenizer = this->m_model->Tokenizer()](
+  auto stream_token = [&pos, &gen, &ntokens, tokenizer = this->m_model->Tokenizer(), &generated_text](
                           int token, float) {
     ++pos;
     if (pos < ntokens) {
@@ -218,7 +219,7 @@ int GemmaWrapper::completionPrompt(std::string& prompt) {
     } else if (token != gcpp::EOS_ID) {
       std::string token_text;
       HWY_ASSERT(tokenizer->Decode(std::vector<int>{token}, &token_text).ok());
-      std::cout << token_text << std::flush;
+      generated_text << token_text;
     }
     return true;
   };
@@ -230,7 +231,8 @@ int GemmaWrapper::completionPrompt(std::string& prompt) {
                  .verbosity = 0},
                 tokens, /*KV cache position = */ 0, this->m_kvcache, pool,
                 stream_token, gen);
-  std::cout << std::endl;
+
+  return generated_text.str();
 }
 
 void GemmaWrapper::loadModel(const std::vector<std::string> &args) {
