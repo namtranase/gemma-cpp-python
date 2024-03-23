@@ -167,3 +167,4 @@ cython_debug/
 models/
 fixed_wheels
 playground
+db.json

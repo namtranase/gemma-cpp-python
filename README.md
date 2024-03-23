@@ -12,10 +12,18 @@
 ## 🙏 Acknowledgments
 Special thanks to the creators and contributors of [gemma.cpp](https://github.com/google/gemma.cpp) for their foundational work.
 
-## 💬 Demo Chat
+## 💬 Demo Chat and Chat with Website!
 Check out the new chat demo included in the examples directory! This interactive interface showcases how you can engage in real-time conversations with the Gemma model.
 
+For the Chat with Website, please visit the [tutorial](examples/webchat/README.md) for more detail/
+
+
+### Using Gemma to chat with website
+![Gemma Cpp Python Chat with Website Demo](asset/demo_chat_website.png)
+
+### Chat with Gemma
 ![Gemma Cpp Python Chat Demo](asset/demo_chat.png)
+
 
 ## 🛠 Installation
 `Prerequisites`: Ensure Python 3.8+ and pip are installed.
