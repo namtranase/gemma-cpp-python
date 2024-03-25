@@ -27,23 +27,26 @@ class CMakeBuild(build_ext):
 
     def build_extension(self, ext):
         extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
+        os.makedirs(self.build_temp, exist_ok=True)
+
         cmake_args = [
-            "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=" + extdir,
-            "-DPYTHON_EXECUTABLE=" + sys.executable,
+            f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extdir}",
+            f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE={extdir}",
+            f"-DPYTHON_EXECUTABLE={sys.executable}",
         ]
+
+        # Allow gemma.cpp to be built on Windows with ClangCL
+        # Refer to https://github.com/google/gemma.cpp/pull/6
+        if platform.system() == "Windows":
+            cmake_args += ["-T", "ClangCL"]
 
         cfg = "Debug" if self.debug else "Release"
         build_args = ["--config", cfg]
 
-        # Add a parallel build option
-        build_args += [
-            "--",
-            "-j",
-            "12",
-        ]
-
-        if not os.path.exists(self.build_temp):
-            os.makedirs(self.build_temp)
+        if platform.system() == "Windows":
+            build_args += ["--", "/m:12"]
+        else:
+            build_args += ["--", "-j12"]
 
         subprocess.check_call(
             ["cmake", ext.sourcedir] + cmake_args, cwd=self.build_temp
