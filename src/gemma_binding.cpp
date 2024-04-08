@@ -255,13 +255,6 @@ void GemmaWrapper::loadModel(const std::vector<std::string> &args) {
 
   hwy::ThreadPool inner_pool(0);
   hwy::ThreadPool pool(this->m_app.num_threads);
-  // For many-core, pinning threads to cores helps.
-  if (this->m_app.num_threads > 10) {
-    PinThreadToCore(this->m_app.num_threads - 1);  // Main thread
-
-    pool.Run(0, pool.NumThreads(),
-             [](uint64_t /*task*/, size_t thread) { PinThreadToCore(thread); });
-  }
 
   if (!this->m_model) {
     this->m_model.reset(new gcpp::Gemma(this->m_loader.tokenizer, this->m_loader.compressed_weights, this->m_loader.ModelType(), pool));
