@@ -59,6 +59,6 @@ class CMakeBuild(build_ext):
 
 
 setup(
-    ext_modules=[CMakeExtension("pygemma")],
+    ext_modules=[CMakeExtension("_pygemma")],
     cmdclass=dict(build_ext=CMakeBuild),
 )
