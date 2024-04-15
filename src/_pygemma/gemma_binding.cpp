@@ -46,7 +46,8 @@ int GemmaModel::get_bos_token() const { return bos_token; }
 
 int GemmaModel::get_eos_token() const { return eos_token; }
 
-std::vector<int> GemmaModel::tokenize(const std::string &text, const bool add_bos) {
+std::vector<int> GemmaModel::tokenize(const std::string &text,
+                                      const bool add_bos) {
   std::vector<int> tokens;
 
   if (!model->Tokenizer()->Encode(text, &tokens).ok()) {
@@ -123,6 +124,8 @@ PYBIND11_MODULE(_pygemma, m) {
   py::class_<GemmaModel>(m, "GemmaModel")
       .def_property_readonly("bos_token", &GemmaModel::get_bos_token,
                              "Get the BOS token")
+      .def_property_readonly("eos_token", &GemmaModel::get_eos_token,
+                             "Get the EOS token")
       .def(py::init<const char *, const char *, int, int, int>(),
            py::arg("tokenizer_path"), py::arg("compressed_weights_path"),
            py::arg("model_type"), py::arg("model_training"),
