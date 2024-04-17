@@ -1,0 +1,58 @@
+name: Tests
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  download-model:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Download model from Kaggle
+        run: |
+          mkdir -p model
+          curl -L -u ${{ secrets.KAGGLE_USERNAME }}:${{ secrets.KAGGLE_KEY }} \
+            -o model/model.tar.gz \
+            "https://www.kaggle.com/api/v1/models/google/gemma/gemmaCpp/2b-it-mqa/1/download"
+        shell: bash
+      - name: Upload model as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: model
+          path: model/
+
+  tests:
+    needs: download-model
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Download model artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: model
+          path: model/
+      - name: Uncompress model files
+        run: |
+          tar -xzf model/model.tar.gz -C model
+          rm model/model.tar.gz
+        shell: bash
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install .[test] -v
+      - name: Test with pytest
+        run: pytest tests/

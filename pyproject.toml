@@ -1,3 +1,24 @@
 [build-system]
 requires = ["setuptools", "wheel", "cmake"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "pygemma"
+version = "0.1.3.post3"
+authors = [
+    {name = "Nam Tran", email = "namtran.ase@gmail.com"},
+]
+description = "Python bindings for the gemma.cpp library"
+readme = "README.md"
+license = { text = "MIT" }
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+requires-python = ">=3.8"
+
+[project.optional-dependencies]
+test = [
+    "pytest>=8.1.1"
+]
